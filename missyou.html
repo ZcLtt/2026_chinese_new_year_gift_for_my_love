@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>穿越时空的爱意 - To My Love</title>
+    <style>
+        /* * =========================================
+         * 全局变量与基础设置
+         * =========================================
+         */
+        :root {
+            --primary-color: #ff6b81;
+            --gold-color: #d4af37;
+            --bg-dark: #0f0c29;
+            --text-color: #2c3e50;
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --font-serif: 'Georgia', serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: #000;
+            overflow: hidden;
+            color: #fff;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* * =========================================
+         * 场景容器
+         * =========================================
+         */
+        .scene {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            z-index: 1;
+            overflow-y: auto;
+            transform: scale(1.1);
+            background-size: cover;
+            background-position: center;
+        }
+
+        .scene.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 10;
+        }
+
+        /* * =========================================
+         * 第一阶段：星光汇聚
+         * =========================================
+         */
+        #scene-opening {
+            background: radial-gradient(circle at center, #1a0b2e 0%, #000000 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #opening-canvas {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
+        }
+
+        .opening-content {
+            position: relative; z-index: 10;
+            display: flex; flex-direction: column; align-items: center; pointer-events: none;
+        }
+
+        .core-heart {
+            font-size: 4rem;
+            color: rgba(255, 255, 255, 0.1);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-bottom: 20px;
+        }
+
+        .core-heart.charging {
+            color: #ff6b81;
+            text-shadow: 0 0 20px #ff6b81;
+            animation: heartPulse 0.4s infinite alternate;
+        }
+
+        .opening-hint {
+            font-family: var(--font-serif); font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.5); letter-spacing: 4px;
+            text-transform: uppercase; margin-top: 20px;
+            opacity: 0.8; transition: opacity 0.5s;
+        }
+        
+        .progress-line-container {
+            width: 200px; height: 2px;
+            background: rgba(255,255,255,0.1); margin-top: 15px;
+            border-radius: 2px; overflow: hidden;
+        }
+        
+        .progress-line {
+            width: 0%; height: 100%;
+            background: linear-gradient(90deg, transparent, #ff6b81, #d4af37, transparent);
+            box-shadow: 0 0 10px #ff6b81; transition: width 0.1s linear;
+        }
+
+        @keyframes heartPulse { from { transform: scale(1.2); } to { transform: scale(1.4); } }
+        
+        .white-flash {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff; z-index: 999; opacity: 0; pointer-events: none;
+            transition: opacity 1.5s ease-out;
+        }
+        .white-flash.active { opacity: 1; }
+
+        /* * =========================================
+         * 第二阶段：菜单
+         * =========================================
+         */
+        #scene-menu {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center; padding: 20px;
+        }
+
+        .menu-title {
+            font-size: 1.5rem; margin-bottom: 40px; text-align: center;
+            font-weight: 300; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+
+        .cards-container {
+            display: flex; flex-direction: column; gap: 25px;
+            width: 100%; max-width: 400px; perspective: 1000px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px; padding: 25px;
+            display: flex; align-items: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer; position: relative; overflow: hidden;
+        }
+
+        .card:hover, .card:active {
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+
+        .card-icon {
+            font-size: 2.5rem; margin-right: 20px;
+            filter: drop-shadow(0 0 5px var(--primary-color));
+        }
+
+        .card-info h3 { font-size: 1.2rem; margin-bottom: 5px; }
+        .card-info p { font-size: 0.9rem; opacity: 0.7; }
+
+        /* * =========================================
+         * 第三阶段 A：时光长廊
+         * =========================================
+         */
+        #scene-timeline { background: #222; padding: 80px 20px 120px; }
+
+        #particles-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: -1;
+        }
+
+        .timeline-container {
+            max-width: 600px; margin: 0 auto; position: relative;
+        }
+        
+        .timeline-container::after {
+            content: ''; position: absolute; width: 2px;
+            background: var(--primary-color); top: 0; bottom: 0; left: 20px;
+            margin-left: -1px; opacity: 0.5;
+        }
+
+        .timeline-item {
+            position: relative; margin-bottom: 40px; padding-left: 50px;
+            opacity: 0; transform: translateX(-30px); transition: all 0.8s ease;
+        }
+        .timeline-item.visible { opacity: 1; transform: translateX(0); }
+
+        .timeline-dot {
+            position: absolute; left: 14px; top: 0; width: 14px; height: 14px;
+            background: #fff; border: 3px solid var(--primary-color);
+            border-radius: 50%; z-index: 2;
+        }
+
+        .timeline-content {
+            background: rgba(255,255,255,0.1); padding: 15px;
+            border-radius: 10px; border: 1px solid var(--glass-border);
+        }
+
+        .timeline-date {
+            font-size: 0.85rem; color: var(--primary-color);
+            margin-bottom: 5px; font-weight: bold;
+        }
+
+        .timeline-img {
+            width: 100%; height: auto; border-radius: 5px; margin-top: 10px;
+            background: #333; min-height: 150px; object-fit: cover;
+        }
+
+        /* * =========================================
+         * 第三阶段 B：深情信笺
+         * =========================================
+         */
+        #scene-letter {
+            background: #fdf6e3; color: #333;
+            padding: 80px 30px 100px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        .paper {
+            width: 100%; max-width: 600px;
+            background-image: linear-gradient(#fdf6e3 95%, #e0e0e0 95%);
+            background-size: 100% 30px; line-height: 30px;
+            font-family: var(--font-serif); font-size: 1.1rem; min-height: 60vh;
+        }
+
+        #typewriter-text { white-space: pre-wrap; }
+
+        .cursor {
+            display: inline-block; width: 2px; height: 1.2rem; background: #333;
+            animation: blink 1s infinite; vertical-align: middle;
+        }
+
+        .heartbeat-btn {
+            margin-top: 40px; padding: 12px 30px;
+            background: var(--primary-color); color: #fff;
+            border: none; border-radius: 25px; font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(255, 107, 129, 0.4);
+            animation: heartBeat Anim 1.5s infinite; cursor: pointer;
+            opacity: 0; transition: opacity 1s;
+        }
+
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 100;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.5s;
+        }
+        .modal.show { opacity: 1; pointer-events: auto; }
+        .polaroid {
+            background: #fff; padding: 15px 15px 60px 15px;
+            transform: rotate(-3deg) scale(0.8); transition: transform 0.5s; text-align: center;
+        }
+        .modal.show .polaroid { transform: rotate(-3deg) scale(1); }
+        .polaroid img { max-width: 80vw; max-height: 50vh; display: block; }
+        .handwritten-text {
+            font-family: 'Dancing Script', cursive; font-size: 2.5rem; color: #fff;
+            position: absolute; bottom: 10%; transform: rotate(-5deg);
+        }
+
+        /* * =========================================
+         * 第三阶段 C：心动盲盒 (Coupon Blind Box)
+         * =========================================
+         */
+        #scene-blindbox {
+            background: radial-gradient(circle at center, #2b1029 0%, #1a0b1f 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+        }
+
+        .box-title {
+            font-size: 1.4rem; color: #fff;
+            margin-bottom: 30px; letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255,107,129,0.5);
+            text-align: center;
+        }
+
+        /* 卡片容器 */
+        .coupon-wrapper {
+            width: 280px;
+            height: 420px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        /* 翻转状态 */
+        .coupon-wrapper.flipped {
+            transform: rotateY(180deg);
+        }
+
+        /* 卡片正反面公共样式 */
+        .coupon-face {
+            position: absolute;
+            width: 100%; height: 100%;
+            backface-visibility: hidden; /* 背面不可见 */
+            border-radius: 20px;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        /* 正面（背面朝上时的样子，即未翻开时） */
+        .coupon-front {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            color: #fff;
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+        
+        .box-icon {
+            font-size: 4rem;
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+        
+        .box-hint {
+            margin-top: 20px; font-size: 1rem; color: #fff;
+            background: rgba(0,0,0,0.1); padding: 5px 15px; border-radius: 20px;
+        }
+
+        /* 背面（翻开后的内容） */
+        .coupon-back {
+            background: #fff;
+            color: #333;
+            transform: rotateY(180deg);
+            padding: 20px;
+            border: 5px solid #ff6b81;
+            text-align: center;
+        }
+
+        .coupon-header {
+            font-size: 0.9rem; color: #888;
+            letter-spacing: 2px; text-transform: uppercase;
+            margin-bottom: 20px; border-bottom: 1px solid #eee;
+            width: 100%; padding-bottom: 10px;
+        }
+
+        .coupon-content {
+            font-size: 1.8rem; font-weight: bold;
+            color: #ff6b81; margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .coupon-desc {
+            font-size: 0.9rem; color: #555;
+            margin-bottom: 30px;
+        }
+
+        .coupon-stamp {
+            border: 2px dashed #ff6b81;
+            padding: 5px 10px; font-size: 0.8rem;
+            color: #ff6b81; transform: rotate(-10deg);
+            opacity: 0.6;
+        }
+
+        .retry-btn {
+            margin-top: 40px;
+            padding: 10px 25px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff; border-radius: 20px;
+            cursor: pointer; opacity: 0; pointer-events: none;
+            transition: all 0.3s;
+        }
+        .retry-btn.visible { opacity: 0.7; pointer-events: auto; }
+        .retry-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* * =========================================
+         * 底部 Dock
+         * =========================================
+         */
+        .dock {
+            position: fixed; bottom: 20px; left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 30px; padding: 10px 25px;
+            display: flex; gap: 25px; z-index: 100;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            opacity: 0; transition: opacity 0.5s; pointer-events: none;
+        }
+        .dock.visible { opacity: 1; pointer-events: auto; }
+
+        .dock-item {
+            color: rgba(255,255,255,0.7); font-size: 1.5rem;
+            cursor: pointer; transition: all 0.3s; position: relative;
+        }
+        .dock-item:hover, .dock-item.active {
+            color: #fff; transform: translateY(-3px);
+            text-shadow: 0 0 10px var(--primary-color);
+        }
+        .dock-item.active::after {
+            content: ''; position: absolute; bottom: -5px; left: 50%;
+            transform: translateX(-50%); width: 5px; height: 5px;
+            background: var(--primary-color); border-radius: 50%;
+        }
+
+        /* 通用动画 */
+        .trail {
+            position: fixed; width: 10px; height: 10px;
+            background: var(--primary-color); border-radius: 50%;
+            pointer-events: none; z-index: 9999; mix-blend-mode: screen;
+            animation: fadeOut 1s forwards;
+        }
+        @keyframes fadeOut { to { opacity: 0; transform: scale(0); } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    </style>
+</head>
+<body>
+
+    <audio id="bgm" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 1. 开场 -->
+    <div id="scene-opening" class="scene active">
+        <canvas id="opening-canvas"></canvas>
+        <div class="opening-content">
+            <div class="core-heart" id="core-heart">❤</div>
+            <div class="opening-hint" id="opening-hint">Hold to Collect</div>
+            <div class="progress-line-container">
+                <div class="progress-line" id="progress-line"></div>
+            </div>
+        </div>
+        <div class="white-flash" id="white-flash"></div>
+    </div>
+
+    <!-- 2. 菜单 -->
+    <div id="scene-menu" class="scene">
+        <h1 class="menu-title">Love Across Time</h1>
+        <div class="cards-container">
+            <div class="card" onclick="switchScene('scene-timeline')">
+                <div class="card-icon">🎞</div>
+                <div class="card-info">
+                    <h3>我们的昨天</h3>
+                    <p>时光长廊 · 10个心动瞬间</p>
+                </div>
+            </div>
+            <div class="card" onclick="switchScene('scene-letter')">
+                <div class="card-icon">✒</div>
+                <div class="card-info">
+                    <h3>此刻的心声</h3>
+                    <p>见字如面 · 读信</p>
+                </div>
+            </div>
+            <div class="card" onclick="switchScene('scene-blindbox')">
+                <div class="card-icon">🎁</div>
+                <div class="card-info">
+                    <h3>爱的盲盒</h3>
+                    <p>心动抽取 · 专属兑换券</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 时光长廊 (已恢复10个瞬间) -->
+    <div id="scene-timeline" class="scene">
+        <canvas id="particles-canvas"></canvas>
+        <div class="timeline-container">
+            
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">2023.05.20</div>
+                    <p>第一次见面的那家咖啡馆，阳光正好，微风不燥。</p>
+                    <img src="https://via.placeholder.com/500x300/ff9a9e/fff?text=Our+First+Meet" class="timeline-img" alt="回忆1">
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">2023.08.15</div>
+                    <p>一起去海边看日出，你说大海藏着好多秘密。</p>
+                    <img src="https://via.placeholder.com/500x300/84fab0/fff?text=Sunrise+by+Sea" class="timeline-img" alt="回忆2">
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">2023.10.01</div>
+                    <p>那次迷路的旅行，却意外发现了最美的风景。</p>
+                    <img src="https://via.placeholder.com/500x300/a18cd1/fff?text=Lost+but+Happy" class="timeline-img" alt="回忆3">
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">2023.12.25</div>
+                    <p>一起度过的第一个圣诞节，虽然很冷，但手心很暖。</p>
+                    <img src="https://via.placeholder.com/500x300/c2e9fb/fff?text=Christmas" class="timeline-img" alt="回忆4">
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">2024.01.01</div>
+                    <p>跨年夜的烟火下，我们许下了关于未来的愿望。</p>
+                    <img src="https://via.placeholder.com/500x300/fbc2eb/fff?text=New+Year+Firework" class="timeline-img" alt="回忆5">
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">2024.02.14</div>
+                    <p>异地后的第一个情人节，视频通话一直开到天亮。</p>
+                    <img src="https://via.placeholder.com/500x300/fad0c4/fff?text=Video+Call" class="timeline-img" alt="回忆6">
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">2024.03.20</div>
+                    <p>收到你寄来的手织围巾，这是春天最温暖的礼物。</p>
+                    <img src="https://via.placeholder.com/500x300/fda085/fff?text=Handmade+Gift" class="timeline-img" alt="回忆7">
+                </div>
+            </div>
+
+             <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">2024.05.01</div>
+                    <p>短暂的五一假期相聚，舍不得分开的车站拥抱。</p>
+                    <img src="https://via.placeholder.com/500x300/e0c3fc/fff?text=Station+Hug" class="timeline-img" alt="回忆8">
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">2024.07.07</div>
+                    <p>同步看着同一部电影，假装你就坐在我身边。</p>
+                    <img src="https://via.placeholder.com/500x300/d4fc79/fff?text=Movie+Sync" class="timeline-img" alt="回忆9">
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">Future...</div>
+                    <p>未完待续，更多美好的记忆等待我们一起创造。</p>
+                    <img src="https://via.placeholder.com/500x300/ff9a9e/fff?text=To+Be+Continued" class="timeline-img" alt="回忆10">
+                </div>
+            </div>
+
+        </div>
+        <div style="height: 100px;"></div> 
+    </div>
+
+    <!-- 4. 信笺 -->
+    <div id="scene-letter" class="scene">
+        <div class="paper">
+            <div id="typewriter-text"></div><span class="cursor"></span>
+        </div>
+        <button class="heartbeat-btn" onclick="showSurprise()">❤ 点这里</button>
+    </div>
+
+    <!-- 弹窗 -->
+    <div id="photo-modal" class="modal" onclick="this.classList.remove('show')">
+        <div class="polaroid">
+            <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=1887&auto=format&fit=crop" alt="Us">
+            <p style="margin-top:10px; color:#555; font-family:'Courier New'">You & Me</p>
+        </div>
+        <div class="handwritten-text">我好想你</div>
+    </div>
+
+    <!-- 5. 盲盒/兑换券 (全新板块) -->
+    <div id="scene-blindbox" class="scene">
+        <h2 class="box-title">Click to Draw</h2>
+        
+        <div class="coupon-wrapper" id="coupon-card" onclick="drawCoupon()">
+            <!-- 正面 -->
+            <div class="coupon-face coupon-front">
+                <div class="box-icon">🎁</div>
+                <div class="box-hint">点击抽取</div>
+            </div>
+            <!-- 背面 (中奖内容) -->
+            <div class="coupon-face coupon-back">
+                <div class="coupon-header">Love Coupon</div>
+                <div class="coupon-content" id="coupon-result-title">?</div>
+                <div class="coupon-desc" id="coupon-result-desc">?</div>
+                <div class="coupon-stamp">Forever Valid</div>
+            </div>
+        </div>
+
+        <button class="retry-btn" id="retry-btn" onclick="resetCoupon(event)">再抽一次</button>
+    </div>
+
+    <!-- Dock -->
+    <div id="dock" class="dock">
+        <div class="dock-item" onclick="switchScene('scene-menu')" title="主页">🏠</div>
+        <div class="dock-item" onclick="switchScene('scene-timeline')" title="回忆">🎞</div>
+        <div class="dock-item" onclick="switchScene('scene-letter')" title="信笺">✒</div>
+        <div class="dock-item" onclick="switchScene('scene-blindbox')" title="盲盒">🎁</div>
+    </div>
+
+    <script>
+        /* * =========================================
+         * 配置区域
+         * =========================================
+         */
+        const config = {
+            loveLetter: "亲爱的：\n\n展信佳。\n\n不知道你看到这封信的时候，是在忙碌的清晨，还是疲惫的深夜。我想告诉你，虽然我们相隔两地，但我的心始终与你同频共振。\n\n距离是暂时的，爱是永恒的。请相信，我们所有的等待，都是为了更好的重逢。\n\n按一下下面的按钮，把我的心意传达给你。\n\n爱你的，\n[你的名字]",
+            typingSpeed: 100,
+            // 兑换券池
+            coupons: [
+                { title: "抱抱券", desc: "凭此券可兑换一个超长时间的温暖拥抱，不限次数。" },
+                { title: "大餐券", desc: "你想吃什么随便点，我买单，并且负责剥虾/烤肉。" },
+                { title: "原谅券", desc: "无论我犯了什么小错误，凭此券无条件原谅一次。" },
+                { title: "按摩券", desc: "享受专属肩颈/背部按摩服务 30 分钟，力度任选。" },
+                { title: "清空购物车", desc: "帮你买下那个你犹豫了很久的小礼物（限额500元以内哈）。" },
+                { title: "听话券", desc: "在接下来的 24 小时内，我都听你的，绝不顶嘴。" },
+                { title: "电影券", desc: "陪你看一场你选的电影，哪怕是我不喜欢的类型。" }
+            ]
+        };
+
+        /* * =========================================
+         * 1. 开场逻辑
+         * =========================================
+         */
+        const openingState = {
+            canvas: null, ctx: null, particles: [], isHolding: false, progress: 0, completed: false
+        };
+
+        function initOpening() {
+            openingState.canvas = document.getElementById('opening-canvas');
+            if(!openingState.canvas) return;
+            openingState.ctx = openingState.canvas.getContext('2d');
+            resizeOpening();
+            window.addEventListener('resize', resizeOpening);
+            for(let i = 0; i < 150; i++) openingState.particles.push(createOpeningParticle());
+            const scene = document.getElementById('scene-opening');
+            scene.addEventListener('mousedown', startHolding);
+            scene.addEventListener('touchstart', startHolding, {passive: false});
+            scene.addEventListener('mouseup', stopHolding);
+            scene.addEventListener('touchend', stopHolding);
+            requestAnimationFrame(renderOpening);
+        }
+
+        function resizeOpening() {
+            if(!openingState.canvas) return;
+            openingState.canvas.width = window.innerWidth;
+            openingState.canvas.height = window.innerHeight;
+        }
+
+        function createOpeningParticle() {
+            const w = window.innerWidth, h = window.innerHeight;
+            return {
+                x: Math.random() * w, y: Math.random() * h,
+                vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5,
+                size: Math.random() * 2 + 0.5,
+                color: Math.random() > 0.5 ? '#ff6b81' : '#d4af37'
+            };
+        }
+
+        function startHolding(e) {
+            if (openingState.completed) return;
+            if (e.type === 'touchstart') e.preventDefault();
+            openingState.isHolding = true;
+            document.getElementById('core-heart').classList.add('charging');
+            document.getElementById('opening-hint').style.opacity = 0;
+            const audio = document.getElementById('bgm');
+            if (audio.paused) audio.play().catch(e => console.log("Audio waiting"));
+        }
+
+        function stopHolding() {
+            if (openingState.completed) return;
+            openingState.isHolding = false;
+            document.getElementById('core-heart').classList.remove('charging');
+            document.getElementById('opening-hint').style.opacity = 0.8;
+        }
+
+        function renderOpening() {
+            if (openingState.completed) return;
+            const { ctx, canvas, particles, isHolding } = openingState;
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const cx = canvas.width / 2, cy = canvas.height / 2;
+
+            particles.forEach(p => {
+                if (isHolding) {
+                    const dx = cx - p.x, dy = cy - p.y;
+                    p.x += dx * 0.08; p.y += dy * 0.08;
+                    if (Math.sqrt(dx*dx + dy*dy) < 50) p.size = Math.random() * 4 + 2;
+                } else {
+                    p.x += p.vx; p.y += p.vy;
+                    if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                    if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+                    if (p.size > 2.5) p.size -= 0.1;
+                }
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = p.color; ctx.fill();
+            });
+
+            if (isHolding) openingState.progress += 1;
+            else if (openingState.progress > 0) openingState.progress -= 2;
+            
+            openingState.progress = Math.max(0, Math.min(100, openingState.progress));
+            document.getElementById('progress-line').style.width = openingState.progress + '%';
+
+            if (openingState.progress >= 100) finishOpening();
+            else requestAnimationFrame(renderOpening);
+        }
+
+        function finishOpening() {
+            openingState.completed = true;
+            const flash = document.getElementById('white-flash');
+            flash.classList.add('active');
+            setTimeout(() => {
+                switchScene('scene-menu');
+                document.getElementById('dock').classList.add('visible');
+                setTimeout(() => { flash.style.opacity = 0; setTimeout(() => flash.remove(), 2000); }, 500);
+            }, 1500);
+        }
+
+        // 2. 场景切换
+        function switchScene(sceneId) {
+            document.querySelectorAll('.scene').forEach(el => el.classList.remove('active'));
+            document.getElementById(sceneId).classList.add('active');
+
+            document.querySelectorAll('.dock-item').forEach(item => {
+                item.classList.remove('active');
+                const iconMap = {'scene-menu':'🏠','scene-timeline':'🎞','scene-letter':'✒','scene-blindbox':'🎁'};
+                if (item.innerText === iconMap[sceneId]) item.classList.add('active');
+            });
+
+            if (sceneId === 'scene-letter') startTypewriter();
+        }
+
+        // 3. 打字机
+        let isTyping = false;
+        function startTypewriter() {
+            if (isTyping || document.getElementById('typewriter-text').innerHTML.length > 0) return;
+            isTyping = true;
+            const text = config.loveLetter;
+            const element = document.getElementById('typewriter-text');
+            let i = 0;
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += (text.charAt(i) === '\n') ? '<br>' : text.charAt(i);
+                    i++; setTimeout(type, config.typingSpeed);
+                } else {
+                    isTyping = false;
+                    document.querySelector('.heartbeat-btn').style.opacity = 1;
+                }
+            }
+            type();
+        }
+        function showSurprise() { document.getElementById('photo-modal').classList.add('show'); }
+
+        // 4. 盲盒逻辑 (New)
+        let isCardFlipped = false;
+        
+        function drawCoupon() {
+            if (isCardFlipped) return;
+            
+            // 随机抽取
+            const randomIndex = Math.floor(Math.random() * config.coupons.length);
+            const selected = config.coupons[randomIndex];
+            
+            // 填充内容
+            document.getElementById('coupon-result-title').innerText = selected.title;
+            document.getElementById('coupon-result-desc').innerText = selected.desc;
+            
+            // 执行翻转动画
+            const card = document.getElementById('coupon-card');
+            card.classList.add('flipped');
+            isCardFlipped = true;
+            
+            // 显示重抽按钮
+            setTimeout(() => {
+                document.getElementById('retry-btn').classList.add('visible');
+            }, 1000);
+        }
+
+        function resetCoupon(e) {
+            e.stopPropagation(); // 防止冒泡触发card click
+            const card = document.getElementById('coupon-card');
+            card.classList.remove('flipped');
+            isCardFlipped = false;
+            document.getElementById('retry-btn').classList.remove('visible');
+        }
+
+        // 5. 拖尾
+        document.addEventListener('mousemove', createTrail);
+        document.addEventListener('touchmove', (e) => createTrail(e.touches[0]));
+        function createTrail(e) {
+            const trail = document.createElement('div');
+            trail.className = 'trail';
+            trail.style.left = e.clientX + 'px';
+            trail.style.top = e.clientY + 'px';
+            document.body.appendChild(trail);
+            setTimeout(() => trail.remove(), 1000);
+        }
+
+        // 6. 滚动监听
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+        }, { threshold: 0.2 });
+        document.querySelectorAll('.timeline-item').forEach(item => observer.observe(item));
+
+        // 7. 时光长廊粒子
+        const pCanvas = document.getElementById('particles-canvas');
+        if(pCanvas){
+             const pCtx = pCanvas.getContext('2d');
+             let pParts = [];
+             pCanvas.width = window.innerWidth; pCanvas.height = window.innerHeight;
+             for(let i=0;i<30;i++) pParts.push({x:Math.random()*pCanvas.width, y:Math.random()*pCanvas.height, r:Math.random()*2});
+             function drawP() {
+                 pCtx.clearRect(0,0,pCanvas.width, pCanvas.height);
+                 pCtx.fillStyle="rgba(255,107,129,0.3)";
+                 pParts.forEach(p=>{
+                     p.y-=0.2; if(p.y<0) p.y=pCanvas.height;
+                     pCtx.beginPath(); pCtx.arc(p.x,p.y,p.r,0,Math.PI*2); pCtx.fill();
+                 });
+                 requestAnimationFrame(drawP);
+             }
+             drawP();
+        }
+
+        window.onload = initOpening;
+
+    </script>
+</body>
+</html>
